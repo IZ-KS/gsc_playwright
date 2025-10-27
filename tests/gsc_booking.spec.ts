@@ -94,7 +94,7 @@ test('should navigate and click Buy Now for a movie on GSC', async ({ page }) =>
     //Selecting seat
     const seatBooked = newPage.getByAltText('occupied');
     const seatRepaired = newPage.getByAltText('repair')
-    const seatSelected = newPage.locator('drag-scroll').getByText('A04')
+    const seatSelected = newPage.locator('drag-scroll').getByText('B04')
 
     const confirmationPrice = newPage.locator('/html/body/app-root/div/app-content-layout/mat-sidenav-container/mat-sidenav-content/div/app-seat-selection/div/div[4]');
     const confirmButton = newPage.getByText(/Confirm/i);
