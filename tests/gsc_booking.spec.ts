@@ -30,7 +30,7 @@ test('should navigate and click Buy Now for a movie on GSC', async ({ page }) =>
         page.context().waitForEvent('page'), // Waits for the context to signal a new page opened
         
         // Trigger the action that opens the new tab
-        await page.getByRole('link', { name: 'Buy Now' }).nth(1).click() 
+        await page.getByRole('link', { name: 'Buy Now' }).nth(2).click() 
         
     ]);
 
@@ -38,18 +38,11 @@ test('should navigate and click Buy Now for a movie on GSC', async ({ page }) =>
     // newPage now holds the reference to the newly opened tab (the booking page)
     console.log(`New tab opened with URL: ${newPage.url()}`);
     
-    // --- INTERACT WITH THE NEW TAB IF NEEDED ---
-    //await newPage.waitForLoadState('networkidle');
-    //await newPage.waitForLoadState('domcontentloaded');
-    
-    // 2. SWITCH BACK TO THE ORIGINAL TAB (The Movies Page)
-    //console.log('Switching back to the original tab...');
-    
     // Use bringToFront() on the original 'page' object
     //await page.bringToFront();
 
     // 1. Define the locator for Selecting Date using the XPath 
-    const dateSelectionButton = newPage.locator('//div/app-showtime-by-movies/div/section[2]/div/app-movie-operation-dates/div/button[4]');
+    const dateSelectionButton = newPage.locator('//div/app-showtime-by-movies/div/section[2]/div/app-movie-operation-dates/div/button[2]');
 
     //console.log(`Element is now in view. Text content: ${await dateSelectionButton.getAttribute('id')}`);
     await dateSelectionButton.click();
@@ -70,13 +63,13 @@ test('should navigate and click Buy Now for a movie on GSC', async ({ page }) =>
 
     // 1. Locate the modal container or the warning text first for context (Optional but safer)
     // We look for the main text in the modal to confirm we have the right one.
-    const ratingModalContainer = newPage.locator('div', { 
+    const ratingModalContainer = newPage.locator('mat-dialog-container', { 
         hasText: RATING_TEXT
     });
-    //const isRatingModalVisible = await ratingModalContainer.isVisible({ timeout: 5000 });
+    const isRatingModalVisible = await ratingModalContainer.isVisible({ timeout: 5000 });
 
     // --- Conditional Logic ---
-//if (isRatingModalVisible) {
+    if (isRatingModalVisible) {
     console.log(`Movie is 18+. Handling rating confirmation.`);
     
     // 2. Locate the PROCEED button *inside* that modal container
@@ -89,10 +82,10 @@ test('should navigate and click Buy Now for a movie on GSC', async ({ page }) =>
     console.log("Successfully clicked PROCEED on the 18+ rating modal.");
     console.log("Successfully clicked PROCEED.");
     
-//} else {
-    console.log("Movie is not 18+ or dialog did not appear. Continuing booking process.");
-    // Script will continue here automatically.
-//}       
+    } else {
+        console.log("Movie is not 18+ or dialog did not appear. Continuing booking process.");
+        // Script will continue here automatically.
+    }       
 
     await newPage.locator('#phoneNo').fill('xxx'); //Enter your phone number
     await newPage.locator('#password').fill('xxx'); //Enter your password
@@ -115,7 +108,7 @@ test('should navigate and click Buy Now for a movie on GSC', async ({ page }) =>
 
     //At this line, it will trigger the timer so comment it out 
     //Take note,I'm still working on cleaning it up
-    await newPage.getByRole('button', { name: 'RM' }).click();
+    //await newPage.getByRole('button', { name: 'RM' }).click();
 
 
     const [paymentPage] = await Promise.all([
