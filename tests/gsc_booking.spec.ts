@@ -51,7 +51,7 @@ test('should navigate and click Buy Now for a movie on GSC', async ({ page }) =>
     // 1. Define the locator for Selecting Date using the XPath 
     const dateSelectionButton = newPage.locator('//div/app-showtime-by-movies/div/section[2]/div/app-movie-operation-dates/div/button[4]');
 
-    console.log(`Element is now in view. Text content: ${await dateSelectionButton.getAttribute('id')}`);
+    //console.log(`Element is now in view. Text content: ${await dateSelectionButton.getAttribute('id')}`);
     await dateSelectionButton.click();
 
     // 2.  Define the locator for Selecting Experience using the XPath 
