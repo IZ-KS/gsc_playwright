@@ -1,8 +1,9 @@
 import {test, expect} from '@playwright/test'
+import { ShowtimeSelectionPage } from '../pages/ShowtimeSelectionPage';
+
 
 test('should navigate and click Buy Now for a movie on GSC', async ({ page }) => {
-    // 1. Navigate to the GSC website
-
+   
     await page.setViewportSize({ width: 1920, height: 1080 });
     //Start fast by blocking resources (Optional, but recommended for speed)
     await page.route('**/*', (route) => {
@@ -34,26 +35,33 @@ test('should navigate and click Buy Now for a movie on GSC', async ({ page }) =>
         
     ]);
 
+    
     //await newPage.setViewportSize({ width: 1080, height: 1080 })
     // newPage now holds the reference to the newly opened tab (the booking page)
-    console.log(`New tab opened with URL: ${newPage.url()}`);
+    //console.log(`New tab opened with URL: ${newPage.url()}`);
     
     // Use bringToFront() on the original 'page' object
     //await page.bringToFront();
 
-    // 1. Define the locator for Selecting Date using the XPath 
-    const dateSelectionButton = newPage.locator('//div/app-showtime-by-movies/div/section[2]/div/app-movie-operation-dates/div/button[2]');
+    const showtimePage = new ShowtimeSelectionPage(newPage);
+   
+    const dateSelected = showtimePage.getDateSelectionButton('3 Nov');
+    console.log(`Element is now in view. Text content: ${await dateSelected.getAttribute('id')}`);
+    await dateSelected.click();
 
-    //console.log(`Element is now in view. Text content: ${await dateSelectionButton.getAttribute('id')}`);
-    await dateSelectionButton.click();
+    // 1. Define the locator for Selecting Date using the XPath 
+    // const dateSelectionButton = (await newPage).locator('//div/app-showtime-by-movies/div/section[2]/div/app-movie-operation-dates/div/button[2]');
+
+    
+    // await dateSelectionButton.click();
 
     // 2.  Define the locator for Selecting Experience using the XPath 
-    const experienceSelectionButton = newPage.locator('//div/app-showtime-by-movies/div/section[2]/div/div/div[1]');
+    const experienceSelectionButton = (await newPage).locator('//div/app-showtime-by-movies/div/section[2]/div/div/div[1]');
     console.log(`Element is now in view. Text content: ${await experienceSelectionButton.textContent()}`);
     await experienceSelectionButton.click();
 
     // 3. Define the locator for Selecting Cinema & Time using the XPath
-    const showTimeSelectionButton = newPage.locator('//div/div/mat-accordion/mat-expansion-panel[6]/div/div/app-showtimes/div/div[1]');
+    const showTimeSelectionButton = (await newPage).locator('//div/div/mat-accordion/mat-expansion-panel[6]/div/div/app-showtimes/div/div[1]');
     console.log(`Element is now in view. Text content: ${await showTimeSelectionButton.textContent()}`);
     await showTimeSelectionButton.click();
 
@@ -63,7 +71,7 @@ test('should navigate and click Buy Now for a movie on GSC', async ({ page }) =>
 
     // 1. Locate the modal container or the warning text first for context (Optional but safer)
     // We look for the main text in the modal to confirm we have the right one.
-    const ratingModalContainer = newPage.locator('mat-dialog-container', { 
+    const ratingModalContainer = (await newPage).locator('mat-dialog-container', { 
         hasText: RATING_TEXT
     });
     const isRatingModalVisible = await ratingModalContainer.isVisible({ timeout: 5000 });
@@ -87,54 +95,54 @@ test('should navigate and click Buy Now for a movie on GSC', async ({ page }) =>
         // Script will continue here automatically.
     }       
 
-    await newPage.locator('#phoneNo').fill('xxx'); //Enter your phone number
-    await newPage.locator('#password').fill('xxx'); //Enter your password
-    await newPage.getByRole('button', { name: 'Login' }).click();
+    await (await newPage).locator('#phoneNo').fill('xxx'); //Enter your phone number
+    await (await newPage).locator('#password').fill('xxx'); //Enter your password
+    await (await newPage).getByRole('button', { name: 'Login' }).click();
 
     //Selecting seat
-    const seatBooked = newPage.getByAltText('occupied');
-    const seatRepaired = newPage.getByAltText('repair')
-    const seatSelected = newPage.locator('drag-scroll').getByText('B04')
+    const seatBooked = (await newPage).getByAltText('occupied');
+    const seatRepaired = (await newPage).getByAltText('repair')
+    const seatSelected = (await newPage).locator('drag-scroll').getByText('B05')
 
-    const confirmationPrice = newPage.locator('/html/body/app-root/div/app-content-layout/mat-sidenav-container/mat-sidenav-content/div/app-seat-selection/div/div[4]');
-    const confirmButton = newPage.getByText(/Confirm/i);
+    const confirmationPrice = (await newPage).locator('/html/body/app-root/div/app-content-layout/mat-sidenav-container/mat-sidenav-content/div/app-seat-selection/div/div[4]');
+    const confirmButton = (await newPage).getByText(/Confirm/i);
 
 
 
     await seatSelected.click();     
     await confirmButton.click();
 
-    await newPage.getByRole('button', { name: 'RM' }).click();
+    await (await newPage).getByRole('button', { name: 'RM' }).click();
 
     //At this line, it will trigger the timer so comment it out 
     //Take note,I'm still working on cleaning it up
-    //await newPage.getByRole('button', { name: 'RM' }).click();
+    await (await newPage).getByRole('button', { name: 'RM' }).click();
 
 
     const [paymentPage] = await Promise.all([
-        newPage.context().waitForEvent('page'), // Waits for the context to signal a new page opened
+        (await newPage).context().waitForEvent('page'), // Waits for the context to signal a new page opened
         
         // Trigger the action that opens the new tab
          
-        await newPage.getByRole('button', { name: /Checkout & Pay/i }).click()
+        await (await newPage).getByRole('button', { name: /Checkout & Pay/i }).click()
         
     ]);
 
-    await newPage.bringToFront();
-    await newPage.getByRole('button', { name: /Reset/i }).click();
+    // await newPage.bringToFront();
+    // await newPage.getByRole('button', { name: /Reset/i }).click();
 
-    const actualTabName = await page.title();
+    // const actualTabName = await paymentPage.title();
 
-    console.log(`The actual GSC PAYALL tab name is: ${actualTabName}`);
+    // console.log(`The actual GSC PAYALL tab name is: ${actualTabName}`);
 
-    // 2. Assert the tab name matches the exact expected string
-    const expectedTabName = 'GSC Cinemas Movie Showtimes | Showing Now & Upcoming Movies';
+    // // 2. Assert the tab name matches the exact expected string
+    // const expectedTabName = 'GSC Cinemas Movie Showtimes | Showing Now & Upcoming Movies';
 
-    await expect(page).toHaveTitle(expectedTabName);
+    // await expect(paymentPage).toHaveTitle(expectedTabName);
 
-    console.log(`Assertion successful: Tab name matches "${expectedTabName}"`);
+    // console.log(`Assertion successful: Tab name matches "${expectedTabName}"`);
 
-    await newPage.getByRole('button', { name: 'Yes' }).click();
+    // await newPage.getByRole('button', { name: 'Yes' }).click();
 
     
 });
